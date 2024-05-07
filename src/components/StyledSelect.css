@@ -1,0 +1,54 @@
+/* eslint-disable */
+.react-select__control {
+    @apply input input-bordered text-base-content h-auto py-1.5
+}
+
+.react-select__input {
+    @apply text-base-content
+}
+
+.react-select__option {
+    @apply p-2
+}
+
+.react-select__option--is-focused {
+    @apply bg-base-300
+}
+
+.react-select__option--is-selected {
+    @apply bg-base-200
+}
+
+.react-select__menu-list {
+    @apply flex flex-col gap-y-2 rounded-btn
+}
+
+.react-select__menu {
+    @apply bg-base-100 border input-bordered text-base-content rounded-btn shadow-lg shadow-neutral mt-1
+}
+
+.react-select__loading-indicator span {
+    @apply hidden
+}
+
+.react-select__loading-indicator:after {
+    display: inline-block;
+    content: "";
+    @apply loading loading-dots loading-xs
+}
+
+.react-select__multi-value {
+    @apply bg-base-200 mr-2 mb-1.5
+}
+
+.react-select__multi-value__label {
+    @apply p-1.5
+}
+
+.react-select__multi-value__remove {
+    @apply p-1
+}
+
+.react-select__multi-value__remove:hover {
+    @apply bg-base-300
+}
