@@ -4,7 +4,14 @@ import {LexicalComposer} from "@lexical/react/LexicalComposer";
 import {ContentEditable} from "@lexical/react/LexicalContentEditable";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 import {PlainTextPlugin} from "@lexical/react/LexicalPlainTextPlugin";
-import {$createParagraphNode, $createTextNode, $getRoot, LexicalEditor, ParagraphNode} from "lexical";
+import {
+    $createParagraphNode,
+    $createTextNode,
+    $getRoot,
+    LexicalEditor,
+    ParagraphNode,
+    SerializedEditorState,
+} from "lexical";
 import {EditorRefPlugin} from "@lexical/react/LexicalEditorRefPlugin";
 import {fetchEventSource} from "@microsoft/fetch-event-source";
 import {useApiContext} from "./APIProvider.tsx";
@@ -12,34 +19,41 @@ import {useHistory} from "./HistoryContext.tsx";
 import {HistoryPlugin} from "@lexical/react/LexicalHistoryPlugin";
 
 interface CompletionsProps {
-    prompt?: string;
+    prompt?: SerializedEditorState;
     parameters?: ParametersValue;
 }
 
 const Completions = (props: CompletionsProps) => {
     const [parameters, setParameters] = useState<ParametersValue>(props.parameters || {} as ParametersValue);
     const editorRef = useRef<LexicalEditor>(null)
-    const [prompt, setPrompt] = useState<string>(props && props.prompt ? props.prompt : "")
+
+    useEffect(() => {
+        if (editorRef.current && props.prompt) {
+            const state = editorRef.current.parseEditorState(props.prompt)
+            editorRef.current.setEditorState(state)
+        }
+    }, [editorRef, props.prompt]);
 
     // Create a ref for the messages
     useEffect(() => {
         setParameters(props.parameters || {} as ParametersValue);
-        if (editorRef.current && props.prompt !== prompt && props.prompt !== "") {
-            editorRef.current!.update(() => {
-                const root = $getRoot()
-                root.clear()
-                const textNode = $createTextNode(props.prompt)
+    }, [props, setParameters])
 
-                const paragraphNode = $createParagraphNode()
-                paragraphNode.append(textNode)
-                root.append(paragraphNode)
-
-            });
+    const prompt = () => {
+        if (!editorRef.current) {
+            return ""
         }
-    }, [props]);
+        let ret = ""
+        editorRef.current.getEditorState().read(() => {
+            const root = $getRoot()
+            ret = root.getTextContent()
+        })
+        return ret
+    }
 
     const history = useHistory()
     const apiContext = useApiContext();
+
     const submit = async () => {
         if (!editorRef.current) {
             return
@@ -61,7 +75,7 @@ const Completions = (props: CompletionsProps) => {
             },
             body: JSON.stringify({
                 model: parameters.model.name,
-                prompt: prompt,
+                prompt: prompt(),
                 max_tokens: parameters.max_tokens,
                 temperature: parameters.temperature,
                 top_p: parameters.top_p,
@@ -101,7 +115,7 @@ const Completions = (props: CompletionsProps) => {
                 // save to history
                 history.addRecord({
                     timestamp: new Date(),
-                    prompt: prompt,
+                    prompt: editorRef.current!.getEditorState().toJSON(),
                     parameters: parameters,
                     time_to_first_token: timeToFirstToken,
                     time_to_last_token: new Date().getTime() - start,
@@ -126,22 +140,8 @@ const Completions = (props: CompletionsProps) => {
         onError: (error: Error) => {
             console.error(error);
         },
-        theme: {}
+        theme: {},
     }
-
-
-    useEffect(() => {
-        if (editorRef.current) {
-            editorRef.current.registerUpdateListener((state) => {
-                state.editorState.read(() => {
-                    const root = $getRoot()
-                    if (root && root.getFirstChild()) {
-                        setPrompt($getRoot().getTextContent())
-                    }
-                })
-            })
-        }
-    }, [editorRef])
 
     return <div className="grid grid-cols-12 h-full overflow-auto gap-3 mb-3">
         <div className="col-span-10 flex flex-col gap-2">
@@ -165,7 +165,7 @@ const Completions = (props: CompletionsProps) => {
             <div className="flex">
                 <button
                     className={`btn btn-primary`}
-                    disabled={prompt === "" || !parameters.model}
+                    disabled={prompt() === "" || !parameters.model}
                     onClick={async () => {
                         await submit()
                     }}
