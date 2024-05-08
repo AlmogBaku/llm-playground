@@ -3,7 +3,7 @@ import Chat from "./Chat.js";
 import {HistoricalBrowser} from "./components/HistoricalBrowser.tsx";
 import {HistoricalRecord} from "./HistoryContext.tsx";
 import {useState} from "react";
-import {TbHistory, TbHistoryToggle, TbMoon, TbSandbox, TbSun} from "react-icons/tb";
+import {TbHistory, TbHistoryToggle, TbMoon, TbSandbox, TbSun, TbSunMoon} from "react-icons/tb";
 import Completions from "./Completions.tsx";
 
 function App() {
@@ -12,6 +12,7 @@ function App() {
 
     const [chatProps, setChatProps] = useState({})
     const [completionProps, setCompletionProps] = useState({})
+    const [theme, setTheme] = useState<"default" | "light" | "dark">("default")
 
     const recoverRecord = (record: HistoricalRecord) => {
         if (record.parameters.model?.type === "chat") {
@@ -22,6 +23,11 @@ function App() {
             setCompletionProps({prompt: record.prompt, parameters: record.parameters})
         }
     }
+    const toggleTheme = () => {
+        const themes = ["default", "light", "dark"];
+        const index = themes.indexOf(theme);
+        setTheme(themes[(index + 1) % themes.length] as "default" | "light" | "dark")
+    };
     return <div className="App flex h-screen flex-col p-3">
         <div className="navbar bg-base-100 gap-2 mb-3 shadow-md rounded-box">
             <div className="flex-1">
@@ -40,14 +46,16 @@ function App() {
                 <TbHistory className="swap-off w-7 h-7"/>
                 <TbHistoryToggle className="swap-on  w-7 h-7"/>
             </label>
-            <label className="swap swap-rotate">
+            <label className="btn btn-ghost btn-circle swap swap-rotate" onClick={toggleTheme}>
 
                 {/* this hidden checkbox controls the state */}
-                <input type="checkbox" className="theme-controller" value="light"/>
+                <input type="radio" checked={theme === 'default'} className="theme-controller" value="default"/>
+                <input type="radio" checked={theme === 'dark'} className="theme-controller" value="dark"/>
+                <input type="radio" checked={theme === 'light'} className="theme-controller" value="light"/>
 
-                {/* sun icon */}
-                <TbSun className="swap-off fill-current w-7 h-7"/>
-                <TbMoon className="swap-on fill-current w-7 h-7"/>
+                <TbSun className={`fill-current w-7 h-7 ${theme === 'light' ? '' : 'opacity-0 -rotate-45'}`}/>
+                <TbSunMoon className={`fill-current w-7 h-7 ${theme === 'default' ? '' : 'opacity-0 -rotate-45'}`}/>
+                <TbMoon className={`fill-current w-7 h-7 ${theme === 'dark' ? '' : 'opacity-0 -rotate-45'}`}/>
             </label>
         </div>
 
