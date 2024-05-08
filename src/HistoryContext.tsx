@@ -2,12 +2,13 @@ import {createContext, Dispatch, ReactNode, SetStateAction, useContext} from "re
 import {MessageType} from "./components/Message.tsx";
 import {ParametersValue} from "./components/Parameters.tsx";
 import {useLocalStorage} from "./LocalStorage.ts";
+import {SerializedEditorState} from "lexical";
 
 export interface HistoricalRecord {
     timestamp: Date
     systemPrompt?: string
     messages?: MessageType[]
-    prompt?: string
+    prompt?: SerializedEditorState
     parameters: ParametersValue
     time_to_first_token: number
     time_to_last_token: number
@@ -49,7 +50,9 @@ class History {
 
     public deleteRecords(records: HistoricalRecord[]) {
         this.set_records((prev) => {
-            return prev.filter((r) => !records.includes(r))
+            return this.normalizeRecords(prev).filter((r) => {
+                !records.some((d) => d.timestamp.getTime() === r.timestamp.getTime() && d.parameters.project === r.parameters.project)
+            })
         })
     }
 
