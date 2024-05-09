@@ -13,6 +13,7 @@ class Model(BaseModel):
     max_tokens: Optional[int] = None
     vendor: Optional[str] = None
     api_key: Optional[str] = Field(None, hidden=True)
+    base_url: Optional[str] = Field(None, hidden=True)
 
 
 class ModelsConfig(BaseModel):
