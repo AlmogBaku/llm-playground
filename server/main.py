@@ -11,7 +11,7 @@ from fastapi.staticfiles import StaticFiles
 from openai import AsyncOpenAI
 
 from src.oai_tokens import num_tokens_from_messages
-from src.types import Model, CompletionsRequest, ChatCompletionsRequest, Settings
+from src.protocol import Model, CompletionsRequest, ChatCompletionsRequest, Settings
 
 models: List[Model] = []
 default_client: AsyncOpenAI
