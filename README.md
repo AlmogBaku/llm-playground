@@ -1,8 +1,7 @@
-<picture>
+<h1><picture>
   <source media="(prefers-color-scheme: dark)" srcset="./logo-light.svg">
-  <img alt="LLM Playground screenshot" src="./logo.svg">
-</picture>
-# LLM Playground
+  <img alt="LLM Playground" src="./logo.svg">
+</picture></h1>
 
 LLM Playground is a versatile environment for experimenting with different large language models (LLMs). It facilitates basic evaluation and comparisons directly in your browser, without the need to set up projects or write code in Jupyter notebooks. This tool supports a variety of LLMs, including OpenAI models, through configurable endpoints.
 
