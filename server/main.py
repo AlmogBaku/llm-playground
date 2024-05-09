@@ -1,5 +1,6 @@
 from contextlib import asynccontextmanager
 from typing import List, AsyncIterator
+from urllib.parse import urlparse
 
 import httpx
 from fastapi import FastAPI
@@ -21,6 +22,8 @@ settings = Settings()
 async def lifespan(app: FastAPI):
     global default_client, models, settings
 
+    oai_default_base_url = "https://api.openai.com/v1"
+
     default_client = AsyncOpenAI(
         api_key=settings.openai_api_key,
         base_url=settings.openai_base_url,
@@ -29,10 +32,10 @@ async def lifespan(app: FastAPI):
 
     if ((settings.openai_base_url is None)
             and settings.openai_api_key
-            and (settings.models.oai_urls is None or ("https://api.openai.com/v1" not in settings.models.oai_urls))):
+            and (settings.models.oai_urls is None or (oai_default_base_url not in settings.models.oai_urls))):
         if settings.models.oai_urls is None:
             settings.models.oai_urls = []
-        settings.models.oai_urls.append("https://api.openai.com/v1")
+        settings.models.oai_urls.append(oai_default_base_url)
 
     for url in settings.models.oai_urls or []:
         cli = AsyncOpenAI(
@@ -40,20 +43,33 @@ async def lifespan(app: FastAPI):
             base_url=url,
         )
         resp = await cli.models.list()
+        base_url = url.rsplit("/models")[0] if url.startswith(settings.openai_base_url or "https://api.openai.com/v1") else None
+        vendor = "OpenAI" if "openai" in url else urlparse(url).hostname.rsplit(".", 1)[0].rsplit(".", 1)[-1]
+
         models += [
-            Model(name=model.id, system_prompt=True, type='chat', vendor='openai')
+            Model(name=model.id, system_prompt=True, type='chat', vendor=vendor, base_url=base_url)
             for model in resp.data if model.id.startswith("gpt")
         ]
         models += [
-            Model(name=model.id, type='completions', vendor='openai')
+            Model(name=model.id, type='completions', vendor=vendor, base_url=base_url)
             for model in resp.data if "instruct" in model.id
         ]
 
     for url in settings.models.urls or []:
-        models += [Model(**model) for model in httpx.get(url).json()]
+        for model in httpx.get(url).json():
+            if model.base_url is None:
+                raise ValueError(f"Model {model.name} is missing a base_url.")
+            if model.vendor is None:
+                model.vendor = urlparse(model.base_url).hostname.rsplit(".", 1)[0].rsplit(".", 1)[-1]
+            models.append(model)
 
     if settings.models.models:
-        models += settings.models.models
+        for model in settings.models.models:
+            if model.base_url is None:
+                raise ValueError(f"Model {model.name} is missing a base_url.")
+            if model.vendor is None:
+                model.vendor = urlparse(model.base_url).hostname.rsplit(".", 1)[0].rsplit(".", 1)[-1]
+            models.append(model)
 
     yield
 
@@ -94,9 +110,10 @@ async def get_models():
 
 
 def client(model: Model) -> AsyncOpenAI:
-    if model.api_key:
+    if model.api_key or model.base_url:
         return AsyncOpenAI(
-            api_key=model.api_key,
+            api_key=model.api_key or settings.openai_api_key,
+            base_url=model.base_url or settings.openai_base_url,
         )
 
     return default_client
