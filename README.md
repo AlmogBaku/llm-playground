@@ -1,12 +1,8 @@
-<svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 160 24" stroke-linecap="round" stroke-linejoin="round" height="60px" width="400px" xmlns="http://www.w3.org/2000/svg">
-  <defs></defs>
-  <path d="M19.953 8.017l1.047 6.983v2a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3v-2l1.245 -8.297a2 2 0 0 1 1.977 -1.703h3.778"></path>
-  <path d="M3 15h18"></path>
-  <path d="M13 3l5.5 1.5"></path>
-  <path d="M15.75 3.75l-2 7"></path>
-  <path d="M7 10.5c1.667 -.667 3.333 -.667 5 0c1.667 .667 3.333 .667 5 0"></path>
-  <text style="font-size: 18px;" x="27.157" y="18.297">LLM Playground</text>
-</svg>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./logo-light.svg">
+  <img alt="LLM Playground screenshot" src="./logo.svg">
+</picture>
+# LLM Playground
 
 LLM Playground is a versatile environment for experimenting with different large language models (LLMs). It facilitates basic evaluation and comparisons directly in your browser, without the need to set up projects or write code in Jupyter notebooks. This tool supports a variety of LLMs, including OpenAI models, through configurable endpoints.
 
