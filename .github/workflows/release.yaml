@@ -99,7 +99,6 @@ jobs:
           echo -e "${{ needs.version.outputs.changelog }}\n\n$(cat CHANGELOG.md)" > CHANGELOG.md
           
           git add CHANGELOG.md
-          git add docs/reference.md
           git commit -m "chore(release): ${{ needs.version.outputs.version }}" CHANGELOG.md
           git push
       - name: Tag
