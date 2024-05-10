@@ -111,7 +111,7 @@ const Parameters = ({value, onChange, type}: ParametersProps) => {
         }>
             <RangeInput label={"Maximum tokens"} value={value.max_tokens}
                         max={value.model?.maxTokens || 2048}
-                        withDisableSwitch
+                        withDisableSwitch={type==="chat"}
                         onChange={(v) => onChangeHandler({max_tokens: v})}
                         factor={1}
             />
