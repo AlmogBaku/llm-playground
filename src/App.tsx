@@ -5,7 +5,7 @@ import {HistoricalRecord} from "./HistoryContext.tsx";
 import {useState} from "react";
 import {TbHistory, TbHistoryToggle, TbMoon, TbSun, TbSunMoon} from "react-icons/tb";
 import Completions from "./Completions.tsx";
-import Logo from "./assets/Logo.svg?react";
+import Logo from "./assets/logo.svg?react";
 
 function App() {
     const [showHistory, setShowHistory] = useState(false);
