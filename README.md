@@ -1,3 +1,7 @@
+![/LICENSE](https://img.shields.io/github/license/AlmogBaku/llm-playground.svg)
+![/issues](https://img.shields.io/github/issues/AlmogBaku/llm-playground.svg)
+![/stargazers](https://img.shields.io/github/stars/AlmogBaku/llm-playground.svg)
+
 <h1><picture>
   <source media="(prefers-color-scheme: dark)" srcset=".github/logo-light.svg">
   <img alt="LLM Playground" src="./src/assets/logo.svg">
