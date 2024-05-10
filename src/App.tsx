@@ -3,8 +3,9 @@ import Chat from "./Chat.js";
 import {HistoricalBrowser} from "./components/HistoricalBrowser.tsx";
 import {HistoricalRecord} from "./HistoryContext.tsx";
 import {useState} from "react";
-import {TbHistory, TbHistoryToggle, TbMoon, TbSandbox, TbSun, TbSunMoon} from "react-icons/tb";
+import {TbHistory, TbHistoryToggle, TbMoon, TbSun, TbSunMoon} from "react-icons/tb";
 import Completions from "./Completions.tsx";
+import Logo from "./assets/Logo.svg?react";
 
 function App() {
     const [showHistory, setShowHistory] = useState(false);
@@ -31,7 +32,7 @@ function App() {
     return <div className="App flex h-screen flex-col p-3">
         <div className="navbar bg-base-100 gap-2 mb-3 shadow-md rounded-box">
             <div className="flex-1">
-                <a className="btn btn-ghost text-xl"><TbSandbox/> LLM Playground</a>
+                <Logo className="w-64" />
             </div>
             <div className="flex-none">
                 <ul className="menu menu-horizontal px-1">
