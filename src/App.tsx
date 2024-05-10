@@ -21,7 +21,7 @@ function App() {
             setChatProps({systemPrompt: record.systemPrompt, messages: record.messages, parameters: record.parameters})
         } else {
             setToggleChatCompletions(false)
-            setCompletionProps({prompt: record.prompt, parameters: record.parameters})
+            setCompletionProps({promptState: record.promptState, parameters: record.parameters})
         }
     }
     const toggleTheme = () => {
@@ -32,7 +32,7 @@ function App() {
     return <div className="App flex h-screen flex-col p-3">
         <div className="navbar bg-base-100 gap-2 mb-3 shadow-md rounded-box">
             <div className="flex-1">
-                <Logo className="w-64" />
+                <Logo className="w-64"/>
             </div>
             <div className="flex-none">
                 <ul className="menu menu-horizontal px-1">
@@ -50,9 +50,10 @@ function App() {
             <label className="btn btn-ghost btn-circle swap swap-rotate" onClick={toggleTheme}>
 
                 {/* this hidden checkbox controls the state */}
-                <input type="radio" checked={theme === 'default'} className="theme-controller" value="default"/>
-                <input type="radio" checked={theme === 'dark'} className="theme-controller" value="dark"/>
-                <input type="radio" checked={theme === 'light'} className="theme-controller" value="light"/>
+                <input type="radio" checked={theme === 'default'} readOnly className="theme-controller"
+                       value="default"/>
+                <input type="radio" checked={theme === 'dark'} readOnly className="theme-controller" value="dark"/>
+                <input type="radio" checked={theme === 'light'} readOnly className="theme-controller" value="light"/>
 
                 <TbSun className={`fill-current w-7 h-7 ${theme === 'light' ? '' : 'opacity-0 -rotate-45'}`}/>
                 <TbSunMoon className={`fill-current w-7 h-7 ${theme === 'default' ? '' : 'opacity-0 -rotate-45'}`}/>
