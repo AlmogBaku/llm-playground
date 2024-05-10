@@ -14,7 +14,7 @@ export interface ModelsContextType {
     apiURL?: string;
 }
 
-const apiURL = import.meta.env.API_BASE_URL || "/api";
+const apiURL = import.meta.env.VITE_API_BASE_URL || "/api";
 export const APIContext = createContext<ModelsContextType>({models: [], apiURL: apiURL})
 
 export const APIProvider = ({children}: { children: ReactNode }) => {
