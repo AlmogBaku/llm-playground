@@ -1,3 +1,14 @@
+## [0.1.3](https://github.com/AlmogBaku/llm-playground/compare/v0.1.2...v0.1.3) (2024-05-10)
+
+
+### Bug Fixes
+
+* document endpoints better ([7b39b2c](https://github.com/AlmogBaku/llm-playground/commit/7b39b2c9bbced25730f8532df902c54273aedbae))
+
+
+
+
+
 
 
 ## [0.1.2](https://github.com/AlmogBaku/llm-playground/compare/v0.1.1...v0.1.2) (2024-05-10)
