@@ -76,8 +76,8 @@ For multiple models, repeat the pattern adjusting the `MODEL_#_` prefix.
 ```yaml
 openai_api_key: "your-openai-api-key"
 models:
-  urls: ["http://example.com/api/models"] # Fetch models from an LLM-Playground compatible API
-  oai_urls: ["http://example.com/api/openai-models"] # Fetch models from an OpenAI compatible API
+  urls: ["https://api.example.com/api/models"] # Fetch models from an LLM-Playground compatible API
+  oai_urls: ["https://api.openai.com/api/v1/models"] # Fetch models from an OpenAI compatible API
   models:
     - name: "llama3"
       description: "Facebook's Llama3 Model"
