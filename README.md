@@ -13,7 +13,7 @@ LLM Playground is a versatile environment for experimenting with different large
 ## Features
 
 - **Flexible Configuration**: Use environmental variables, a settings YAML file, or a `.env` file.
-- **Support for Multiple Vendors**: Compatible with OpenAI and other LLM providers through the [LiteLLM Proxy](https://docs.litellm.ai/docs/simple_proxy).
+- **Support for Multiple Vendors**: Compatible with OpenAI protocol (you can configure other providers by setting up an [LiteLLM Proxy](https://docs.litellm.ai/docs/simple_proxy)).
 - **Easy to Use**: Designed for straightforward setup and minimal overhead.
 
 ## Getting Started
@@ -49,7 +49,7 @@ LLM Playground allows various configuration methods including environment variab
 Configure your models using one of the following methods:
 
 1. **Direct Configuration**: Specify models directly in the `models.models` parameter.
-2. **API Provider URLs**: Set `models.urls` to fetch models from an LLM-Playground compatible API((need to return an array of Model)[server/src/protocol.py]).
+2. **API Provider URLs**: Set `models.urls` to fetch models from an LLM-Playground compatible API ([GET request that returns an array of Model](server/src/protocol.py#L8)).
 3. **OpenAI API URLs**: Set `models.oai_urls` to fetch models from an OpenAI compatible API.
 
 Each model can be configured with a `base_url` if it does not utilize OpenAI or is not fetched from `models.oai_urls`.
