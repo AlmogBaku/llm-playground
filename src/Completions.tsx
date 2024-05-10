@@ -19,37 +19,38 @@ import {useHistory} from "./HistoryContext.tsx";
 import {HistoryPlugin} from "@lexical/react/LexicalHistoryPlugin";
 
 interface CompletionsProps {
-    prompt?: SerializedEditorState;
+    promptState?: SerializedEditorState;
     parameters?: ParametersValue;
 }
 
 const Completions = (props: CompletionsProps) => {
     const [parameters, setParameters] = useState<ParametersValue>(props.parameters || {} as ParametersValue);
+    const [prompt, setPrompt] = useState<string>("");
     const editorRef = useRef<LexicalEditor>(null)
 
     useEffect(() => {
-        if (editorRef.current && props.prompt) {
-            const state = editorRef.current.parseEditorState(props.prompt)
+        if (!editorRef.current) {
+            return
+        }
+        editorRef.current.registerUpdateListener(({editorState}) => {
+            editorState.read(() => {
+                const root = $getRoot()
+                setPrompt(root.getTextContent())
+            })
+        })
+    }, []);
+
+    useEffect(() => {
+        if (editorRef.current && props.promptState) {
+            const state = editorRef.current.parseEditorState(props.promptState)
             editorRef.current.setEditorState(state)
         }
-    }, [editorRef, props.prompt]);
+    }, [editorRef, props.promptState]);
 
     // Create a ref for the messages
     useEffect(() => {
         setParameters(props.parameters || {} as ParametersValue);
     }, [props, setParameters])
-
-    const prompt = () => {
-        if (!editorRef.current) {
-            return ""
-        }
-        let ret = ""
-        editorRef.current.getEditorState().read(() => {
-            const root = $getRoot()
-            ret = root.getTextContent()
-        })
-        return ret
-    }
 
     const history = useHistory()
     const apiContext = useApiContext();
@@ -75,7 +76,7 @@ const Completions = (props: CompletionsProps) => {
             },
             body: JSON.stringify({
                 model: parameters.model.name,
-                prompt: prompt(),
+                prompt: prompt,
                 max_tokens: parameters.max_tokens,
                 temperature: parameters.temperature,
                 top_p: parameters.top_p,
@@ -115,7 +116,7 @@ const Completions = (props: CompletionsProps) => {
                 // save to history
                 history.addRecord({
                     timestamp: new Date(),
-                    prompt: editorRef.current!.getEditorState().toJSON(),
+                    promptState: editorRef.current!.getEditorState().toJSON(),
                     parameters: parameters,
                     time_to_first_token: timeToFirstToken,
                     time_to_last_token: new Date().getTime() - start,
@@ -165,7 +166,7 @@ const Completions = (props: CompletionsProps) => {
             <div className="flex">
                 <button
                     className={`btn btn-primary`}
-                    disabled={prompt() === "" || !parameters.model}
+                    disabled={prompt === "" || !parameters.model}
                     onClick={async () => {
                         await submit()
                     }}

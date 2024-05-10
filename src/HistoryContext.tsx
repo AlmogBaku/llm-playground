@@ -8,7 +8,7 @@ export interface HistoricalRecord {
     timestamp: Date
     systemPrompt?: string
     messages?: MessageType[]
-    prompt?: SerializedEditorState
+    promptState?: SerializedEditorState
     parameters: ParametersValue
     time_to_first_token: number
     time_to_last_token: number
@@ -18,7 +18,7 @@ export interface HistoricalRecord {
 }
 
 class History {
-    private _records: HistoricalRecord[] = []
+    private readonly _records: HistoricalRecord[] = []
     public set_records: Dispatch<SetStateAction<HistoricalRecord[]>>
 
     constructor(records: HistoricalRecord[], set_records: Dispatch<SetStateAction<HistoricalRecord[]>>) {
