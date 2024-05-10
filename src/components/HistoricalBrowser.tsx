@@ -131,19 +131,24 @@ export const HistoricalBrowser = ({onRecordSelected}: {
 
 
     return <>
-        <ul className="menu menu-xs w-full">
-            {Object.keys(projects).map((project) => {
-                return <ProjectHistory
-                    key={project}
-                    project={project}
-                    records={projects[project]}
-                    isOpen={project === ""}
-                    onRecordSelected={onRecordSelected}
-                    deleteRecord={deleteRecord}
-                    deleteProject={deleteProject}
-                />
-            })}
-        </ul>
+        {history.records.length === 0 ? <div className="text-center text-content p-5">
+                <h3 className="text-lg font-bold">No records found 🫣</h3>
+                <p className="mt-2">Start generating some completions to see them here, and track your progress 🤩.</p>
+            </div> :
+            <ul className="menu menu-xs w-full">
+                {Object.keys(projects).map((project) => {
+                    return <ProjectHistory
+                        key={project}
+                        project={project}
+                        records={projects[project]}
+                        isOpen={project === ""}
+                        onRecordSelected={onRecordSelected}
+                        deleteRecord={deleteRecord}
+                        deleteProject={deleteProject}
+                    />
+                })}
+            </ul>
+        }
         <dialog className="modal" ref={modal}>
             <div className="modal-box">
                 <h3 className="font-bold text-lg">Are you sure?</h3>
