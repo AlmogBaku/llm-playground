@@ -1,5 +1,5 @@
 <h1><picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./logo-light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset=".github/logo-light.svg">
   <img alt="LLM Playground" src="./src/assets/logo.svg">
 </picture></h1>
 
