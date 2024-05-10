@@ -8,6 +8,9 @@ on:
       - 'server/**'
       - 'src/**'
       - 'index.html'
+      - '*.json'
+      - '*.js'
+      - 'yarn.lock'
   workflow_dispatch: ~
 
 permissions:
