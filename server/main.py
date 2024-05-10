@@ -3,12 +3,14 @@ from typing import List, AsyncIterator
 from urllib.parse import urlparse
 
 import httpx
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.responses import StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from openai import AsyncOpenAI
+from openai.types.chat import ChatCompletionChunk
+from openai.types.completion import Completion
 
 from src.oai_tokens import num_tokens_from_messages
 from src.protocol import Model, CompletionsRequest, ChatCompletionsRequest, Settings
@@ -43,7 +45,8 @@ async def lifespan(app: FastAPI):
             base_url=url,
         )
         resp = await cli.models.list()
-        base_url = url.rsplit("/models")[0] if url.startswith(settings.openai_base_url or "https://api.openai.com/v1") else None
+        base_url = url.rsplit("/models")[0] if url.startswith(
+            settings.openai_base_url or "https://api.openai.com/v1") else None
         vendor = "OpenAI" if "openai" in url else urlparse(url).hostname.rsplit(".", 1)[0].rsplit(".", 1)[-1]
 
         models += [
@@ -105,7 +108,7 @@ async def event_stream(resp: AsyncIterator, prompt, model: Model):
 
 
 @app.get("/api/models")
-async def get_models():
+async def get_models() -> List[Model]:
     return models
 
 
@@ -119,21 +122,21 @@ def client(model: Model) -> AsyncOpenAI:
     return default_client
 
 
-@app.post("/api/chat/completions")
-async def chat_completions(req: ChatCompletionsRequest):
-    model = next((model for model in models if model.name == req.model), None)
+@app.post("/api/chat/completions", response_model=ChatCompletionChunk, response_class=StreamingResponse)
+async def chat_completions(req: ChatCompletionsRequest) -> StreamingResponse:
+    model = next((model for model in models if model.name == req.model and model.type == "chat"), None)
     if not model:
-        return {"error": "Model not found."}
+        raise HTTPException(status_code=404, detail="Model not found.")
 
     resp = await client(model).chat.completions.create(**req.model_dump())
     return StreamingResponse(event_stream(resp, req.messages, model), media_type="text/event-stream")
 
 
-@app.post("/api/completions")
-async def completions(req: CompletionsRequest):
-    model = next((model for model in models if model.name == req.model), None)
+@app.post("/api/completions", response_model=Completion, response_class=StreamingResponse)
+async def completions(req: CompletionsRequest) -> StreamingResponse:
+    model = next((model for model in models if model.name == req.model and model.type == "completions"), None)
     if not model:
-        return {"error": "Model not found."}
+        raise HTTPException(status_code=404, detail="Model not found.")
 
     resp = await client(model).completions.create(**req.model_dump())
     return StreamingResponse(event_stream(resp, req.prompt, model), media_type="text/event-stream")

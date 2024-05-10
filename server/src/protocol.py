@@ -1,7 +1,7 @@
 from typing import Literal, Optional, List, Union
 
 from openai.types.chat import ChatCompletionMessageParam
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -12,8 +12,8 @@ class Model(BaseModel):
     system_prompt: Optional[bool] = None
     max_tokens: Optional[int] = None
     vendor: Optional[str] = None
-    api_key: Optional[str] = Field(None, hidden=True)
-    base_url: Optional[str] = Field(None, hidden=True)
+    api_key: Optional[SecretStr] = Field(None, exclude=True)
+    base_url: Optional[SecretStr] = Field(None, exclude=True)
 
 
 class ModelsConfig(BaseModel):
