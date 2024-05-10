@@ -6,8 +6,8 @@
 LLM Playground is a versatile environment for experimenting with different large language models (LLMs). It facilitates basic evaluation and comparisons directly in your browser, without the need to set up projects or write code in Jupyter notebooks. This tool supports a variety of LLMs, including OpenAI models, through configurable endpoints.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./screenshot-dark.png">
-  <img alt="LLM Playground screenshot" src="./screenshot.png">
+  <source media="(prefers-color-scheme: dark)" srcset="./.github/screencast-dark.gif">
+  <img alt="LLM Playground screenshot" src=".github/screencast.gif">
 </picture>
 
 ## Features
@@ -15,6 +15,7 @@ LLM Playground is a versatile environment for experimenting with different large
 - **Flexible Configuration**: Use environmental variables, a settings YAML file, or a `.env` file.
 - **Support for Multiple Vendors**: Compatible with OpenAI protocol (you can configure other providers by setting up an [LiteLLM Proxy](https://docs.litellm.ai/docs/simple_proxy)).
 - **Easy to Use**: Designed for straightforward setup and minimal overhead.
+- **Rate experiments**: Compare different experiments by categorizing them and rating their performance.
 
 ## Getting Started
 
