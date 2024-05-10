@@ -3,7 +3,8 @@ import Chat from "./Chat.js";
 import {HistoricalBrowser} from "./components/HistoricalBrowser.tsx";
 import {HistoricalRecord} from "./HistoryContext.tsx";
 import {useState} from "react";
-import {TbHistory, TbHistoryToggle, TbMoon, TbSun, TbSunMoon} from "react-icons/tb";
+import {TbHistory, TbHistoryToggle, TbMoon, TbSun} from "react-icons/tb";
+import { MdMotionPhotosAuto  } from "react-icons/md";
 import Completions from "./Completions.tsx";
 import Logo from "./assets/logo.svg?react";
 
@@ -55,7 +56,7 @@ function App() {
                 <input type="radio" checked={theme === 'light'} className="theme-controller" value="light"/>
 
                 <TbSun className={`fill-current w-7 h-7 ${theme === 'light' ? '' : 'opacity-0 -rotate-45'}`}/>
-                <TbSunMoon className={`fill-current w-7 h-7 ${theme === 'default' ? '' : 'opacity-0 -rotate-45'}`}/>
+                <MdMotionPhotosAuto  className={`fill-current w-7 h-7 ${theme === 'default' ? '' : 'opacity-0 -rotate-45'}`}/>
                 <TbMoon className={`fill-current w-7 h-7 ${theme === 'dark' ? '' : 'opacity-0 -rotate-45'}`}/>
             </label>
         </div>
