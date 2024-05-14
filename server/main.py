@@ -1,5 +1,5 @@
 from contextlib import asynccontextmanager
-from typing import List, AsyncIterator
+from typing import List, AsyncIterator, Optional
 from urllib.parse import urlparse
 
 import httpx
@@ -16,7 +16,7 @@ from src.oai_tokens import num_tokens_from_messages
 from src.protocol import Model, CompletionsRequest, ChatCompletionsRequest, Settings
 
 models: List[Model] = []
-default_client: AsyncOpenAI
+default_client: Optional[AsyncOpenAI] = None
 settings = Settings()
 
 
@@ -55,7 +55,7 @@ async def lifespan(app: FastAPI):
         ]
         models += [
             Model(name=model.id, type='completions', vendor=vendor, base_url=base_url)
-            for model in resp.data if "instruct" in model.id
+            for model in resp.data if model.id.startswith("gpt-3.5-turbo-instruct")
         ]
 
     for url in settings.models.urls or []:
@@ -98,9 +98,9 @@ def healthz():
 async def event_stream(resp: AsyncIterator, prompt, model: Model):
     tokens = 0
     async for event in resp:
-        if "usage" in event:
+        if hasattr(event, "usage") and event.usage:
             tokens += event.usage.tokens
-        yield f"event: completion\ndata: {event.json()}\n\n"
+        yield f"event: completion\ndata: {event.model_dump_json()}\n\n"
 
     if tokens == 0 and model.vendor == "openai":
         tokens = num_tokens_from_messages(prompt, model.name)
@@ -109,35 +109,40 @@ async def event_stream(resp: AsyncIterator, prompt, model: Model):
 
 @app.get("/api/models")
 async def get_models() -> List[Model]:
+    global models
     return models
+
+
+def model_by_name_and_type(name: str, type: str) -> Model:
+    global models
+    model = next((model for model in models if model.name == name and model.type == type), None)
+    if not model:
+        raise HTTPException(status_code=404, detail="Model not found.")
+    return model
 
 
 def client(model: Model) -> AsyncOpenAI:
     if model.api_key or model.base_url:
         return AsyncOpenAI(
-            api_key=model.api_key or settings.openai_api_key,
-            base_url=model.base_url or settings.openai_base_url,
+            api_key=model.api_key.get_secret_value() if model.api_key else settings.openai_api_key,
+            base_url=model.base_url.get_secret_value() if model.base_url else settings.openai_base_url,
         )
+    if not default_client:
+        raise HTTPException(status_code=500, detail="Default client not set.")
 
     return default_client
 
 
 @app.post("/api/chat/completions", response_model=ChatCompletionChunk, response_class=StreamingResponse)
 async def chat_completions(req: ChatCompletionsRequest) -> StreamingResponse:
-    model = next((model for model in models if model.name == req.model and model.type == "chat"), None)
-    if not model:
-        raise HTTPException(status_code=404, detail="Model not found.")
-
+    model = model_by_name_and_type(req.model, "chat")
     resp = await client(model).chat.completions.create(**req.model_dump())
     return StreamingResponse(event_stream(resp, req.messages, model), media_type="text/event-stream")
 
 
 @app.post("/api/completions", response_model=Completion, response_class=StreamingResponse)
 async def completions(req: CompletionsRequest) -> StreamingResponse:
-    model = next((model for model in models if model.name == req.model and model.type == "completions"), None)
-    if not model:
-        raise HTTPException(status_code=404, detail="Model not found.")
-
+    model = model_by_name_and_type(req.model, "completions")
     resp = await client(model).completions.create(**req.model_dump())
     return StreamingResponse(event_stream(resp, req.prompt, model), media_type="text/event-stream")
 
