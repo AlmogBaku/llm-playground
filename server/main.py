@@ -32,22 +32,21 @@ async def lifespan(app: FastAPI):
         organization=settings.openai_organization
     )
 
-    if ((settings.openai_base_url is None)
-            and settings.openai_api_key
-            and (settings.models.oai_urls is None or (oai_default_base_url not in settings.models.oai_urls))):
+    if settings.openai_base_url is None and settings.openai_api_key and settings.models.oai_urls is None:
         if settings.models.oai_urls is None:
             settings.models.oai_urls = []
         settings.models.oai_urls.append(oai_default_base_url)
 
     for url in settings.models.oai_urls or []:
+        base_url = url.rsplit("/models")[0] if url.startswith(
+            settings.openai_base_url or oai_default_base_url) else None
+        vendor = "OpenAI" if "openai" in url else urlparse(url).hostname.rsplit(".", 1)[0].rsplit(".", 1)[-1]
+
         cli = AsyncOpenAI(
             api_key=settings.openai_api_key,
             base_url=url,
         )
         resp = await cli.models.list()
-        base_url = url.rsplit("/models")[0] if url.startswith(
-            settings.openai_base_url or "https://api.openai.com/v1") else None
-        vendor = "OpenAI" if "openai" in url else urlparse(url).hostname.rsplit(".", 1)[0].rsplit(".", 1)[-1]
 
         models += [
             Model(name=model.id, system_prompt=True, type='chat', vendor=vendor, base_url=base_url)
