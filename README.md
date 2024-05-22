@@ -65,8 +65,8 @@ LLM Playground allows various configuration methods including environment variab
 Configure your models using one of the following methods:
 
 1. **Direct Configuration**(`modeld.models`): Directly specifying the models in the configuration.
-2. **API Provider URLs**(`models.urls`): Fetching the models from an LLM Playground compatible API ([GET request that returns an array of Model](server/src/protocol.py#L8)).
-3. **OpenAI API URLs**(`models.oai_urls`): Fetching the models from an OpenAI compatible API.
+2. **API Provider URLs**(`models.urls`): **Recommended** Fetching the models from an LLM Playground compatible API ([GET request that returns an array of Model](server/src/protocol.py#L8)).
+3. **OpenAI API URLs**(`models.oai_urls`): Fetching the models from an OpenAI compatible API. *This is **not recommended** due to the lack of information that this protocol provides.* 
 
 Each model can be configured with a `base_url` if it does not utilize OpenAI or is not fetched from `models.oai_urls`.
 
